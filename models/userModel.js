@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
+const List = require("./customlist")
 
 const userSchema = new mongoose.Schema(
     [{ 
         email : {
             type : String,
-            required : true ,
-            unique : true
+            required : true,
+            
         },
+        
         name: { 
             type: String, 
             required: true, 
@@ -24,7 +26,8 @@ const userSchema = new mongoose.Schema(
             default : false
         }
     
-    }],
+    }
+    ],
     {timestamps : true}
 )
 

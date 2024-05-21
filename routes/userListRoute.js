@@ -4,7 +4,8 @@ const {
   addConstomFields,
     handleCsvFile,
     umsubscribesdUser,
-    sendBulkmails
+    sendBulkmails,
+    getalllists
 } = require("../controllers/userListManagerController")
 
 const multer = require("multer")
@@ -38,5 +39,6 @@ router.post("/addCustomFields",addConstomFields);
 router.post("/addCsv/:listid",upload.single("file"),handleCsvFile);
 router.get("/unsubscribes/:userid",umsubscribesdUser)
 router.post("/sendBulkEmail", sendBulkmails)
+router.get("/getalluserbylist", getalllists)
 
 module.exports = router

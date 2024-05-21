@@ -90,18 +90,33 @@ const handleCsvFile = async(req,res)=>{
 
                 try {
                     const _user = await User.create({ name: Name, email: Email, customProperties: customprops });
-                    list.userID.push(_user._id); // Add user ID to list
-                    success++;
+                    if(!list.userID.find(userId => userId.email === _user.email)){
+                        list.userID.push(_user._id); // Add user ID to list
+                        success++;
+                    }
                 } catch (e) {
                     errorlist.push(e);
                 }
-
                 stream.resume(); // Resume the stream after async operation
             })
             .on("end", async (rowcount) => {
                 await list.save(); // Save the list with updated user IDs
                 total = rowcount; // Set the total count of processed rows
                 console.log(errorlist);
+                
+                if (errorlist.length > 0) {
+                    const errorCSV = errorlist.map((u,index) => `\nRow Number : ${index},\nError : ${u.errorResponse.errmsg}`).join('\n');
+                    fs.writeFileSync('uploads/error.csv', `name,email,error\n${errorCSV}`);
+                    res
+                    .download('uploads/error.csv')
+                    // .status(201).send({
+                    //     success: true,
+                    //     useraddcount: success,
+                    //     errorCount: errorlist.length,
+                    //     errorlist,
+                    //     totaluser: total,
+                    // });
+                }
                 res.status(201).send({
                     success: true,
                     useraddcount: success,
@@ -127,13 +142,13 @@ const handleCsvFile = async(req,res)=>{
 
 const sendBulkmails = async(req,res)=>{
     try{
-        const users = await User.find()
+        const users = await User.find({ unsubscribed: false })
         // console.log(users)
         if(users){
             for(const user of users){
                 const subject = `MathonGo||test email`
                 const text = `Activity Update with MathonGo`
-                if (user.unsubscribed){ return;}
+               
                 await SendEmail(user, subject, text)
                 // console.log(user.email)
             }
@@ -163,9 +178,35 @@ const umsubscribesdUser = async(req,res)=>{
         if(uesrupdate){
             res.status(200).json({
                 success: true,
-                message : "You have unsubscribed. You will no longer receive from MathonGo"
+                message : "You have unsubscribed. You will no longer receive emails from MathonGo"
             })
-            console.log("You have unsubscribed. You will no longer receive from MathonGo")
+            console.log("You have unsubscribed. You will no longer receive email from MathonGo")
+        }
+    }
+    catch(error){
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const getalllists=async(req,res)=>{
+    try{
+        const lists = await listSchema.find().populate("userID")
+        if(lists){
+            console.log(lists)
+            for(const list in lists){
+
+            }
+            res.status(201).send({
+                success : true,
+                data : lists,
+                msg : "Found data successfully"
+            })
+        }
+        else{
+            res.status(200).send({
+                success : false,
+                msg : "data not found"
+            })
         }
     }
     catch(error){
@@ -177,5 +218,6 @@ module.exports={
     handleCsvFile,
     addConstomFields,
     umsubscribesdUser,
-    sendBulkmails   
+    sendBulkmails  ,
+    getalllists 
 }
