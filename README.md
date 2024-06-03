@@ -1,7 +1,7 @@
 A RESTful API for managing a list of users with customizable properties and sending emails to the users.
 
 - Postman Documentaion Link : https://documenter.getpostman.com/view/28127581/2sA3QmEvMD
-- App deployment Link : https://ill-khakis-duck.cyclic.app
+- App deployment Link : https://userlistmanagement-9era.onrender.com/api/getalluserbylist
 
 - To run server follow following steps
   1. Clone the repository
